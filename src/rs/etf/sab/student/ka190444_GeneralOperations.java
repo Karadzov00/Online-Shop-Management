@@ -6,6 +6,7 @@ package rs.etf.sab.student;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,12 +46,66 @@ public class ka190444_GeneralOperations implements GeneralOperations {
 
     @Override
     public Calendar time(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+
+        
+        String queryUpdate =
+                "update System\n" +
+                "set CurrentTime = DATEADD(DAY, ?, (\n" +
+                "select CurrentTime \n" +
+                "from System\n" +
+                "where IdSystem=1))\n" +
+                "where IdSystem=1";
+        
+        try(PreparedStatement ps = conn.prepareStatement(queryUpdate);) {
+            ps.setInt(1, i);
+            ps.executeUpdate(); 
+            System.out.println(i+" days have passed in system");
+           
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        String querySelect = 
+                "select CurrentTime from System\n" +
+                "where IdSystem=1"; 
+        try(PreparedStatement ps1 = conn.prepareStatement(querySelect);
+            ResultSet rs = ps1.executeQuery();) { 
+            
+            if(rs.next()){
+                System.out.println("current time after days passed is "+rs.getDate("CurrentTime"));
+                Calendar calendar = Calendar.getInstance(); 
+                calendar.setTime(rs.getDate("CurrentTime"));
+                return calendar; 
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null; 
     }
 
     @Override
     public Calendar getCurrentTime() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query =
+                "select top 1 CurrentTime\n" +
+                "from System";
+        
+        try(PreparedStatement ps = conn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery()) {
+            if(rs.next()){
+                Calendar calendar = Calendar.getInstance(); 
+                calendar.setTime(rs.getDate("CurrentTime"));
+                System.out.println("current time is "+calendar.getTime());
+                return calendar; 
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null; 
+        
     }
 
     @Override
