@@ -94,7 +94,42 @@ public class ka190444_BuyerOperations implements BuyerOperations{
 
     @Override
     public BigDecimal increaseCredit(int i, BigDecimal bd) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query=
+                "update Customers set Balance=\n" +
+                "Balance + ?\n" +
+                "where IdCustomer=?";
+        try(PreparedStatement ps = conn.prepareStatement(query);) {
+            ps.setBigDecimal(1, bd);
+            ps.setInt(2, i);
+            ps.executeUpdate(); 
+            System.out.println("balance of customer updated by:"+bd);
+            
+            String querySelect =
+                    "select Balance\n" +
+                    "from Customers\n" +
+                    "where IdCustomer=?";
+             try (
+                PreparedStatement stmt = conn.prepareStatement(querySelect);
+                ) {
+                stmt.setInt(1, i);
+                try(ResultSet rs = stmt.executeQuery();) {
+                     if(rs.next()){
+                         System.out.println("credit after adding sum is "+rs.getDouble("Balance"));
+                         return new BigDecimal(rs.getDouble("Balance")); 
+                     }
+                } catch (SQLException ex) {
+                Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (SQLException ex) {
+            Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        return null;
     }
 
     @Override
@@ -109,7 +144,27 @@ public class ka190444_BuyerOperations implements BuyerOperations{
 
     @Override
     public BigDecimal getCredit(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String querySelect =
+                    "select Balance\n" +
+                    "from Customers\n" +
+                    "where IdCustomer=?";
+            try (
+                PreparedStatement stmt = conn.prepareStatement(querySelect);
+                ) {
+                stmt.setInt(1, i);
+                try(ResultSet rs = stmt.executeQuery();) {
+                     if(rs.next()){
+                         System.out.println("credit for customer is "+rs.getDouble("Balance"));
+                         return new BigDecimal(rs.getDouble("Balance")); 
+                     }
+                } catch (SQLException ex) {
+                Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (SQLException ex) {
+            Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return null; 
     }
     
 }
