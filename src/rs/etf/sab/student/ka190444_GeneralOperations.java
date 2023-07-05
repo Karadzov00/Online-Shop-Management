@@ -73,9 +73,9 @@ public class ka190444_GeneralOperations implements GeneralOperations {
             ResultSet rs = ps1.executeQuery();) { 
             
             if(rs.next()){
-                System.out.println("current time after days passed is "+rs.getDate("CurrentTime"));
                 Calendar calendar = Calendar.getInstance(); 
                 calendar.setTime(rs.getDate("CurrentTime"));
+                System.out.println("current time after days passed is "+calendar.getTime());
                 return calendar; 
             }
             
@@ -110,7 +110,23 @@ public class ka190444_GeneralOperations implements GeneralOperations {
 
     @Override
     public void eraseAll() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query =
+                "delete from Articles\n" +
+                "delete from Cities\n" +
+                "delete from Customers\n" +
+                "delete from Distances\n" +
+                "delete from OrderArticle\n" +
+                "delete from Shops\n" +
+                "delete from [System]\n" +
+                "delete from Transactions";
+        
+        try(PreparedStatement ps = conn.prepareStatement(query);) { 
+            ps.executeUpdate();
+            System.out.println("data in database cleared");
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }
