@@ -10,10 +10,10 @@ public class StudentMain {
 
     public static void main(String[] args) {
 
-        ArticleOperations articleOperations = null; // Change this for your implementation (points will be negative if interfaces are not implemented).
+        ArticleOperations articleOperations = new ka190444_ArticleOperations(); // Change this for your implementation (points will be negative if interfaces are not implemented).
         BuyerOperations buyerOperations = null;
         CityOperations cityOperations = null;
-        GeneralOperations generalOperations = null;
+        GeneralOperations generalOperations = new ka190444_GeneralOperations();
         OrderOperations orderOperations = null;
         ShopOperations shopOperations = null;
         TransactionOperations transactionOperations = null;
