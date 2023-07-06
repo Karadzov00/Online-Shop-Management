@@ -97,11 +97,29 @@ public class ka190444_CityOperations implements CityOperations {
             stmt.setInt(2, i1);
             stmt.setInt(3, i1);
             stmt.setInt(4, i);
-            stmt.executeQuery();
             try(ResultSet rs = stmt.executeQuery()) {
                 if(!rs.next())
                     return -1; 
                 
+                String queryInsert = "insert into Distances(idCity1, idCity2, distance) values (?,?,?)";
+                try ( PreparedStatement ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    ps.setInt(1, i);
+                    ps.setInt(2, i1);
+                    ps.setInt(3, i2);
+                    ps.executeUpdate();
+                    
+                    try(ResultSet rsInsert = ps.getGeneratedKeys();) {
+                        if (rsInsert.next()) {
+                            System.out.println("new line is created with id" + rsInsert.getInt(1));
+                            return rsInsert.getInt(1);
+                        }
+                        
+                    } catch (SQLException ex) {
+                    Logger.getLogger(ka190444_CityOperations.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(ka190444_CityOperations.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 
                 
             } catch (SQLException ex) {
