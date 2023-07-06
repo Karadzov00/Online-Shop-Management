@@ -37,7 +37,7 @@ public class ka190444_ArticleOperations implements ArticleOperations{
                     System.out.println("a new article was created with id: "+rs.getInt(1));
                     return rs.getInt(1); 
                 }
-                          
+                           
             }catch (SQLException ex) {
             Logger.getLogger(ka190444_ArticleOperations.class.getName()).log(Level.SEVERE, null, ex);
             }            

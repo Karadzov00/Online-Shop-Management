@@ -22,6 +22,7 @@ public class ka190444_CityOperations implements CityOperations {
 
     @Override
     public int createCity(String string) {
+        System.out.println("rs.etf.sab.student.ka190444_CityOperations.createCity()");
         Connection conn = DB.getInstance().getConnection();
         String querySelect = "select *\n" +
                             "from Cities\n" +

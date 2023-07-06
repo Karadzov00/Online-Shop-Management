@@ -54,8 +54,8 @@ public class ka190444_BuyerOperations implements BuyerOperations{
         String query=
                 "update Customers set IdCity=? where IdCustomer=?"; 
         try(PreparedStatement ps = conn.prepareStatement(query);) {
-            ps.setInt(1, i);
-            ps.setInt(2, i1);
+            ps.setInt(1, i1);
+            ps.setInt(2, i);
             ps.executeUpdate(); 
             System.out.println("city with id:"+i1+" set to customer with id:"+i);
             return 1; 
