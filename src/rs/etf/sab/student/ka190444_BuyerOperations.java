@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
@@ -134,12 +135,50 @@ public class ka190444_BuyerOperations implements BuyerOperations{
 
     @Override
     public int createOrder(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query ="insert into Orders(IdCustomer)values(?)";
+        try ( PreparedStatement ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, i);
+            ps.executeUpdate();
+            try(ResultSet rs = ps.getGeneratedKeys();) {
+                if (rs.next()) {
+                    System.out.println("new order created with id: "+rs.getInt(1));
+                    return rs.getInt(1);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_BuyerOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_BuyerOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1; 
     }
 
     @Override
     public List<Integer> getOrders(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query =
+                "select IdOrder\n" +
+                "from Orders\n" +
+                "where IdCustomer=?";
+        List<Integer>orders = new ArrayList<>(); 
+        try ( PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, i);
+            try ( ResultSet rs = stmt.executeQuery()) {
+                System.out.println("orders");
+                while(rs.next()) {
+                    System.out.println(rs.getInt("IdOrder"));
+                    orders.add(rs.getInt("IdOrder"));
+                }
+                return orders;
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_BuyerOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_BuyerOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return orders; 
+        
     }
 
     @Override
