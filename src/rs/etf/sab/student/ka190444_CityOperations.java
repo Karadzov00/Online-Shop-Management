@@ -98,11 +98,13 @@ public class ka190444_CityOperations implements CityOperations {
             stmt.setInt(3, i1);
             stmt.setInt(4, i);
             try(ResultSet rs = stmt.executeQuery()) {
-                if(!rs.next())
+                if(rs.next()){
+                    System.out.println("the line between these 2 cities already exists");
                     return -1; 
+                }
                 
                 String queryInsert = "insert into Distances(idCity1, idCity2, distance) values (?,?,?)";
-                try ( PreparedStatement ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                try ( PreparedStatement ps = conn.prepareStatement(queryInsert, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     ps.setInt(1, i);
                     ps.setInt(2, i1);
                     ps.setInt(3, i2);
@@ -135,12 +137,63 @@ public class ka190444_CityOperations implements CityOperations {
 
     @Override
     public List<Integer> getConnectedCities(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query = 
+                "select IdCity1, IdCity2\n" +
+                "from Distances\n" +
+                "where IdCity1=? or IdCity2=?";
+        List<Integer> cities= new ArrayList<>(); 
+        try ( PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, i);
+            stmt.setInt(2, i);
+            stmt.executeQuery(); 
+            try ( ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int cityId1 = rs.getInt("IdCity1");
+                    int cityId2 = rs.getInt("IdCity2");
+                    System.out.println("city line:"+cityId1+","+cityId2);
+                    if(cityId1!=i)//we chose the other city in the line 
+                        cities.add(cityId1); 
+                    else if (cityId2!=i)
+                        cities.add(cityId2);
+                }
+                return cities; 
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_CityOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_CityOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return cities; 
+
     }
 
     @Override
     public List<Integer> getShops(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query =
+                "select IdShop\n" +
+                "from Shops\n" +
+                "where IdCity=?"; 
+        List<Integer> shops= new ArrayList<>(); 
+        try ( PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, i);
+            stmt.executeQuery(); 
+            try ( ResultSet rs = stmt.executeQuery()) {
+                System.out.println("list of shops in this city");
+                while (rs.next()) {
+                    System.out.println(rs.getInt(1));
+                    shops.add(rs.getInt(1));
+                }
+                return shops; 
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_CityOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_CityOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null; 
     }
     
 }
