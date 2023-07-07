@@ -112,16 +112,21 @@ public class ka190444_GeneralOperations implements GeneralOperations {
     public void eraseAll() {
         Connection conn = DB.getInstance().getConnection();
         String query =
-                "delete from Cities\n" +
-                "delete from Shops\n" +
-                "delete from Articles\n" +
-                "delete from Customers\n" +
-                "delete from Orders\n" +
-                "delete from OrderArticle\n" +
-                "delete from System\n" +
-                "delete from Transactions\n" +
-                "delete from Articles\n" +
-                "delete from Distances";
+                "exec sp_MSForEachTable 'DISABLE TRIGGER ALL ON ?'\n" +
+                "exec sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'\n" +
+                "DELETE FROM OrderArticle;\n" +
+                "DELETE FROM Transactions;\n" +
+                "-- Delete content from tables referencing other tables\n" +
+                "DELETE FROM Customers;\n" +
+                "DELETE FROM Orders;\n" +
+                "-- Delete content from other tables\n" +
+                "DELETE FROM Articles;\n" +
+                "DELETE FROM Shops;\n" +
+                "DELETE FROM Cities;\n" +
+                "DELETE FROM System;\n" +
+                "DELETE FROM Distances;\n" +
+                "exec sp_MSForEachTable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL'\n" +
+                "exec sp_MSForEachTable 'ENABLE TRIGGER ALL ON ?'";
         
         try(PreparedStatement ps = conn.prepareStatement(query);) { 
             ps.executeUpdate();

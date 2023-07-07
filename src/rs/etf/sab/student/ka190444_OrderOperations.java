@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
@@ -132,7 +133,27 @@ public class ka190444_OrderOperations implements OrderOperations {
 
     @Override
     public List<Integer> getItems(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query =  "select IdItem\n" +
+                        "from OrderArticle\n" +
+                        "where IdOrder=?"; 
+        List<Integer> items = new ArrayList<>(); 
+        try (PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setInt(1, i);
+            try(ResultSet rs = stmt.executeQuery()) {
+                System.out.println("items");
+                while(rs.next()) {
+                    System.out.println(rs.getInt(1));
+                    items.add(rs.getInt(1));
+                }
+                return items; 
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null; 
     }
 
     @Override
@@ -152,22 +173,98 @@ public class ka190444_OrderOperations implements OrderOperations {
 
     @Override
     public String getState(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query = "select State\n" +
+                        "from Orders\n" +
+                        "where IdOrder=?"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setInt(1, i);
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    System.out.println("state for selected order is:"+rs.getString(1));
+                    return rs.getString(1); 
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     @Override
     public Calendar getSentTime(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query = "select TimeSent\n" +
+                        "from Orders\n" +
+                        "where IdOrder=?"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setInt(1, i);
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    Calendar calendar = Calendar.getInstance(); 
+                    calendar.setTime(rs.getDate(1));
+                    System.out.println("sent time is "+calendar.getTime());
+                    return calendar; 
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;    
     }
 
     @Override
     public Calendar getRecievedTime(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query = "select TimeReceived\n" +
+                        "from Orders\n" +
+                        "where IdOrder=?"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setInt(1, i);
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    Calendar calendar = Calendar.getInstance(); 
+                    calendar.setTime(rs.getDate(1));
+                    System.out.println("received time is "+calendar.getTime());
+                    return calendar; 
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;   
     }
 
     @Override
     public int getBuyer(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query = "select IdCustomer\n" +
+                        "from Orders\n" +
+                        "where IdOrder=?"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setInt(1, i);
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    System.out.println("customer for selected order is:"+rs.getInt(1));
+                    return rs.getInt(1); 
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
     }
 
     @Override
