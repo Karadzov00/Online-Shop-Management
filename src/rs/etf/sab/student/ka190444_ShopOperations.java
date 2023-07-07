@@ -197,8 +197,7 @@ public class ka190444_ShopOperations implements ShopOperations {
                         "from Articles\n" +
                         "where IdShop=?"; 
         List<Integer> articles = new ArrayList<>(); 
-        try (
-            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+        try (PreparedStatement stmt = conn.prepareStatement(query);  ) {
             stmt.setInt(1, i);
             try(ResultSet rs = stmt.executeQuery()) {
                 System.out.println("articles");
@@ -219,7 +218,25 @@ public class ka190444_ShopOperations implements ShopOperations {
 
     @Override
     public int getDiscount(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query = "select Discount \n" +
+                        "from Shops\n" +
+                        "where IdShop=?"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setInt(1, i);
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    System.out.println("discount for given shop is:"+rs.getInt(1));
+                    return rs.getInt(1); 
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0; 
     }
     
 }
