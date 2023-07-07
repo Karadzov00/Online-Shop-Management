@@ -110,14 +110,14 @@ public class ka190444_BuyerOperations implements BuyerOperations{
                     "select Balance\n" +
                     "from Customers\n" +
                     "where IdCustomer=?";
-             try (
+            try (
                 PreparedStatement stmt = conn.prepareStatement(querySelect);
                 ) {
                 stmt.setInt(1, i);
                 try(ResultSet rs = stmt.executeQuery();) {
                      if(rs.next()){
-                         System.out.println("credit after adding sum is "+rs.getDouble("Balance"));
-                         return new BigDecimal(rs.getDouble("Balance")); 
+                         System.out.println("credit after adding sum is "+rs.getBigDecimal("Balance"));
+                         return rs.getBigDecimal("Balance"); 
                      }
                 } catch (SQLException ex) {
                 Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
@@ -194,8 +194,8 @@ public class ka190444_BuyerOperations implements BuyerOperations{
                 stmt.setInt(1, i);
                 try(ResultSet rs = stmt.executeQuery();) {
                      if(rs.next()){
-                         System.out.println("credit for customer is "+rs.getDouble("Balance"));
-                         return new BigDecimal(rs.getDouble("Balance")); 
+                         System.out.println("credit for customer is "+rs.getBigDecimal("Balance"));
+                         return rs.getBigDecimal("Balance"); 
                      }
                 } catch (SQLException ex) {
                 Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
