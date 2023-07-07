@@ -50,9 +50,9 @@ public class ka190444_OrderOperations implements OrderOperations {
                             "where IdOrder=? and IdArticle=?"; 
                     try (
                         PreparedStatement ps = conn.prepareStatement(querySelectArticle);  ) {
-                        stmt.setInt(1, i);
-                        stmt.setInt(2, i1);
-                        try(ResultSet rsArticle = stmt.executeQuery()) {
+                        ps.setInt(1, i);
+                        ps.setInt(2, i1);
+                        try(ResultSet rsArticle = ps.executeQuery()) {
                             if(rsArticle.next()) {
                                 //article exists in that order
                                 //need to update amount
@@ -61,13 +61,41 @@ public class ka190444_OrderOperations implements OrderOperations {
                                         "update OrderArticle \n" +
                                         "set Amount=Amount+?\n" +
                                         "where IdOrder=? and IdArticle=?"; 
-                                
+                                        try(
+                                            PreparedStatement psUpdate = conn.prepareStatement(queryUpdate)
+                                        ){
+                                            psUpdate.setInt(1, i2);
+                                            psUpdate.setInt(2, i);
+                                            psUpdate.setInt(3, i1);
+                                            psUpdate.executeUpdate(); 
+                                            System.out.println("article amount is increased by:"+i2);
+
+                                        } catch (SQLException ex) {
+                                            Logger.getLogger(ka190444_GeneralOperations.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
                             }
                             else{
                                 //article doesn't exists in that order
                                 System.out.println("article doesn't exists in given order");
-
+                                String queryInsert = "insert into OrderArticle(IdOrder, IdArticle, Amount)\n" +
+                                                        "values(?, ?, ?)"; 
                                 
+                                try ( PreparedStatement psInsert = conn.prepareStatement(queryInsert, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                                    psInsert.setInt(1, i);
+                                    psInsert.setInt(2, i1);
+                                    psInsert.setInt(3, i2);
+                                    psInsert.executeUpdate();
+                                    try(ResultSet rsInsert = psInsert.getGeneratedKeys();) {
+                                        if (rsInsert.next()) {
+                                            System.out.println("new item created with id:"+rsInsert.getInt(1));
+                                        }
+                                        
+                                    } catch (SQLException ex) {
+                                        Logger.getLogger(ka190444_OrderOperations.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                } catch (SQLException ex) {
+                                    Logger.getLogger(ka190444_OrderOperations.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
                         } catch (SQLException ex) {
                             Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
@@ -86,8 +114,20 @@ public class ka190444_OrderOperations implements OrderOperations {
     }
 
     @Override
-    public int removeArticle(int i, int i1) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public int removeArticle(int i, int i1) {//(int orderId, int articleId)
+        Connection conn = DB.getInstance().getConnection();
+        String query = "delete from OrderArticle\n" +
+                        "where IdOrder=? and IdArticle=?";
+        try ( PreparedStatement ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, i);
+            ps.setInt(2, i1);
+            ps.executeUpdate();
+            System.out.println("removed article with id:"+i+" from order with id:"+i);
+            return 1; 
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_OrderOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1; 
     }
 
     @Override
