@@ -15,7 +15,7 @@ public class StudentMain {
         CityOperations cityOperations = new ka190444_CityOperations();
         GeneralOperations generalOperations = new ka190444_GeneralOperations();
         OrderOperations orderOperations = null;
-        ShopOperations shopOperations = null;
+        ShopOperations shopOperations = new ka190444_ShopOperations();
         TransactionOperations transactionOperations = null;
 
         TestHandler.createInstance(

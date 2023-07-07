@@ -143,15 +143,19 @@ public class ka190444_ShopOperations implements ShopOperations {
         try ( PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, i1);
             ps.setInt(2, i);//article id
+//            System.out.println("amount to be added: "+i1);
+//            System.out.println("article: "+i1);
             ps.executeUpdate(); 
             String querySelect = "select Amount from Articles where IdArticle=?";
             try (
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(querySelect)) {
                 stmt.setInt(1, i);
                 try(ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        System.out.println("new amount of selected article:"+rs.getInt(1));
-                        return rs.getInt(1); 
+                        System.out.println("selected article: "+i);
+                        System.out.println("after adding "+i1);
+                        System.out.println("new amount of selected article:"+rs.getInt("Amount"));
+                        return rs.getInt("Amount"); 
                     }
                 } catch (SQLException ex) {
                 Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
