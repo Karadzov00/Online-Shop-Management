@@ -136,7 +136,7 @@ public class ka190444_BuyerOperations implements BuyerOperations{
     @Override
     public int createOrder(int i) {
         Connection conn = DB.getInstance().getConnection();
-        String query ="insert into Orders(IdCustomer)values(?)";
+        String query ="insert into Orders(IdCustomer, [State])values(?, 'created')";
         try ( PreparedStatement ps = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, i);
             ps.executeUpdate();
