@@ -102,6 +102,55 @@ public class DijkstraAlgorithm {
 
         return path;
     }
+    
+    private static void calculateShortestPath(Map<Integer, Map<Integer, Integer>> graph, int vertex1, int vertex2) {
+        Map<Integer, Integer> distances = new HashMap<>();
+        Map<Integer, Integer> previousVertices = new HashMap<>();
+        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>();
+
+        for (int vertex : graph.keySet()) {
+            distances.put(vertex, INFINITY);
+            previousVertices.put(vertex, null);
+        }
+
+        distances.put(vertex1, 0);
+        priorityQueue.offer(new Vertex(vertex1, 0));
+
+        while (!priorityQueue.isEmpty()) {
+            Vertex currentVertex = priorityQueue.poll();
+            int currentCity = currentVertex.city;
+
+            if (currentCity == vertex2) {
+                break;
+            }
+
+            for (Map.Entry<Integer, Integer> neighbor : graph.get(currentCity).entrySet()) {
+                int neighborCity = neighbor.getKey();
+                int distance = neighbor.getValue();
+
+                if (distances.get(currentCity) + distance < distances.get(neighborCity)) {
+                    distances.put(neighborCity, distances.get(currentCity) + distance);
+                    previousVertices.put(neighborCity, currentCity);
+                    priorityQueue.offer(new Vertex(neighborCity, distances.get(neighborCity)));
+                }
+            }
+        }
+
+        int distance = distances.get(vertex2);
+        List<Integer> path = buildPath(vertex2, previousVertices);
+        System.out.print("Shortest Path from Vertex " + vertex1 + " to " + vertex2 + ": ");
+        for (int i = 0; i < path.size(); i++) {
+            int vertex = path.get(i);
+            if (i == 0) {
+                System.out.print(vertex);
+            } else {
+                int previousVertex = path.get(i - 1);
+                int vertexDistance = distances.get(vertex) - distances.get(previousVertex);
+                System.out.print(" (" + vertex + " (" + vertexDistance + "))");
+            }
+        }
+        System.out.println("\nDistance: " + distance);
+    }
 
     public static Map<Integer, Map<Integer, Integer>> formGraph(){
         Connection conn = DB.getInstance().getConnection();
@@ -135,7 +184,9 @@ public class DijkstraAlgorithm {
     public static void main(String[] args) {
         Map<Integer, Map<Integer, Integer>> graph = new HashMap<>();
         graph = formGraph();
-        dijkstra(graph, 232);
+//        dijkstra(graph, 233);
+        //TODO: pomocna metoda createTracking(); 
+        calculateShortestPath(graph, 236, 233);
 
     }
 
