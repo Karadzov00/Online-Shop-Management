@@ -72,7 +72,11 @@ public class DijkstraAlgorithm {
 
         while (vertex != 0) {
             path.add(0, vertex);
-            vertex = previousVertices.get(vertex);
+            Integer previousVertex = previousVertices.get(vertex);
+            if (previousVertex == null) {
+                break;
+            }
+            vertex = previousVertex;
         }
 
         return path;
@@ -112,7 +116,7 @@ public class DijkstraAlgorithm {
             }
 
             printGraph(graph);
-            dijkstra(graph, 1);
+            dijkstra(graph, 232);
 
             resultSet.close();
             statement.close();
