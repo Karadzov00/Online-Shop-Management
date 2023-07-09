@@ -186,7 +186,9 @@ public class DijkstraAlgorithm {
         graph = formGraph();
 //        dijkstra(graph, 233);
         //TODO: pomocna metoda createTracking(); 
-        calculateShortestPath(graph, 236, 233);
+        calculateShortestPath(graph, 264, 261); 
+        calculateShortestPath(graph, 265, 261);
+        calculateShortestPath(graph, 261, 262);
 
     }
 

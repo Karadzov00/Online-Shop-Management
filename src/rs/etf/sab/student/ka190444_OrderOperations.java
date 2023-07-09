@@ -163,12 +163,44 @@ public class ka190444_OrderOperations implements OrderOperations {
 
     @Override
     public BigDecimal getFinalPrice(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query = "EXECUTE SP_FINAL_PRICE ?"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setInt(1, i);
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    System.out.println("final price for given order is:"+rs.getBigDecimal(1));
+                    return rs.getBigDecimal(1); 
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     @Override
     public BigDecimal getDiscountSum(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        String query = "EXECUTE SP_FINAL_DISCOUNT ?"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setInt(1, i);
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    System.out.println("final discount for given order is:"+rs.getBigDecimal(1));
+                    return rs.getBigDecimal(1); 
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     @Override
