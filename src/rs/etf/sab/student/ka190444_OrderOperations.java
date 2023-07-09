@@ -158,7 +158,92 @@ public class ka190444_OrderOperations implements OrderOperations {
 
     @Override
     public int completeOrder(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Connection conn = DB.getInstance().getConnection();
+        BigDecimal finalPrice = getFinalPrice(i); 
+        List<Integer> shopCities = new ArrayList<>(); 
+
+        String query = "select IdCustomer\n" +
+                        "from Customers\n" +
+                        "where Balance >= ?"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            stmt.setBigDecimal(1, finalPrice);
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(!rs.next()) {//if result set is empty 
+                    System.out.println("there's not enough money, order can't be completed");
+                    return -1; 
+                }
+                
+                
+                DijkstraAlgorithm.formGraph(); 
+                //select customer city 
+                String queryCustomerCity = 
+                        "select c.IdCity\n" +
+                        "from Orders o join Customers c \n" +
+                        "on o.IdCustomer = c.IdCustomer\n" +
+                        "where IdOrder=?"; 
+                try (
+                    PreparedStatement psCustCity = conn.prepareStatement(queryCustomerCity);  ) {
+                    psCustCity.setInt(1, i);
+                    try(ResultSet rsCustCity = psCustCity.executeQuery()) {
+                        if(rsCustCity.next()) {
+                            System.out.println("customer city is:"+rsCustCity.getInt(1));
+                            int customerCity = rsCustCity.getInt(1); 
+                        }
+                        else 
+                            return -1;
+                        
+                        
+                        
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //select shop cities 
+                String queryShopCities = 
+                        "select IdCity\n" +
+                        "from OrderArticle oa \n" +
+                        "join articles a on oa.IdArticle=a.IdArticle \n" +
+                        "join Shops s on s.IdShop = a.IdShop\n" +
+                        "where IdOrder=?"; 
+                try (
+                    PreparedStatement psShopCities = conn.prepareStatement(queryShopCities);  ) {
+                    psShopCities.setInt(1, i);
+                    System.out.println("shop cities for given order");
+                    try(ResultSet rsShopCities = psShopCities.executeQuery()) {
+                        
+                        while(rsShopCities.next()) {
+                            System.out.println(rsShopCities.getInt(1));
+                            shopCities.add(rsShopCities.getInt(1));   
+                        }
+                        
+                        
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                //calculate nearest shop
+                int nearestShop = -1; 
+                int nearestDistance = -1; 
+                
+                
+                
+                
+                
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
+
     }
 
     @Override
