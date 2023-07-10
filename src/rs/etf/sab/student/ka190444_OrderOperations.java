@@ -164,18 +164,45 @@ public class ka190444_OrderOperations implements OrderOperations {
         List<Integer> shopCities = new ArrayList<>(); 
         Map<Integer, Map<Integer, Integer>> graph; 
         int customerCity=-1; 
-
-        String query = "select IdCustomer\n" +
-                        "from Customers\n" +
-                        "where Balance >= ?"; 
+        //check if customer has money 
+        String query = 
+                    "select c.Balance\n" +
+                    "from Customers c join Orders o\n" +
+                    "on c.IdCustomer=o.IdCustomer\n" +
+                    "where o.IdOrder=?"; 
         try (
             PreparedStatement stmt = conn.prepareStatement(query);  ) {
-            stmt.setBigDecimal(1, finalPrice);
+            stmt.setInt(1, i);
             try(ResultSet rs = stmt.executeQuery()) {
-                if(!rs.next()) {//if result set is empty 
-                    System.out.println("there's not enough money, order can't be completed");
-                    return -1; 
+                if(rs.next()) {//if result set is empty 
+                    BigDecimal balance = rs.getBigDecimal(1); 
+                    if(balance.compareTo(finalPrice)<0){
+                        System.out.println("there's not enough money, order can't be completed");
+                        return -1;
+                    }
                 }
+                
+                //take money from customer's balance
+                String queryUpdateBalance =
+                        "update Customers \n" +
+                        "set Balance=Balance-?\n" +
+                        "where IdCustomer=(\n" +
+                        "select c.IdCustomer from Customers c\n" +
+                        "join Orders o on c.IdCustomer=o.IdCustomer\n" +
+                        "where o.IdOrder=?\n" +
+                        ")"; 
+                try ( PreparedStatement psBalance = conn.prepareStatement(queryUpdateBalance)) {
+                    psBalance.setBigDecimal(1, finalPrice);
+                    psBalance.setInt(2, i);
+                    if(psBalance.executeUpdate()==1){
+                        System.out.println("balance of user updated ");
+                        
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                //make new transactions for every shop from the order 
                 
                 
                 graph = DijkstraAlgorithm.formGraph(); 
@@ -241,8 +268,14 @@ public class ka190444_OrderOperations implements OrderOperations {
                         nearestShop=idCity; 
                     }
                 }
-                //step 1: send from all shop to nearest shop, write it to db
-                
+                //step 1: send from all shops to nearest shop, write it to db
+                for(int idCity:shopCities){
+                    if(idCity!=nearestShop){
+                        DijkstraAlgorithm.calculateShortestPathDBInsert(i, graph, idCity, nearestShop);  
+                    }
+                }
+                //step 2: send from nearest shop to customer city 
+                DijkstraAlgorithm.calculateShortestPathDBInsert(i, graph, nearestShop, customerCity); 
                 
                 
             } catch (SQLException ex) {
