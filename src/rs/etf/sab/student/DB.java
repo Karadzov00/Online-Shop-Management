@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class DB {
     private static final String username = "sa";
     private static final String password = "123";
-    private static final String database = "OnlineShop3";
+    private static final String database = "OnlineShop5";
     private static final int port = 1433;
     private static final String serverName = "localhost";
     
