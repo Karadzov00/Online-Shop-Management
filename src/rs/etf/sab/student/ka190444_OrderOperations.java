@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import rs.etf.sab.operations.OrderOperations;
@@ -161,6 +162,8 @@ public class ka190444_OrderOperations implements OrderOperations {
         Connection conn = DB.getInstance().getConnection();
         BigDecimal finalPrice = getFinalPrice(i); 
         List<Integer> shopCities = new ArrayList<>(); 
+        Map<Integer, Map<Integer, Integer>> graph; 
+        int customerCity=-1; 
 
         String query = "select IdCustomer\n" +
                         "from Customers\n" +
@@ -175,7 +178,7 @@ public class ka190444_OrderOperations implements OrderOperations {
                 }
                 
                 
-                DijkstraAlgorithm.formGraph(); 
+                graph = DijkstraAlgorithm.formGraph(); 
                 //select customer city 
                 String queryCustomerCity = 
                         "select c.IdCity\n" +
@@ -188,7 +191,7 @@ public class ka190444_OrderOperations implements OrderOperations {
                     try(ResultSet rsCustCity = psCustCity.executeQuery()) {
                         if(rsCustCity.next()) {
                             System.out.println("customer city is:"+rsCustCity.getInt(1));
-                            int customerCity = rsCustCity.getInt(1); 
+                            customerCity = rsCustCity.getInt(1); 
                         }
                         else 
                             return -1;
@@ -229,10 +232,16 @@ public class ka190444_OrderOperations implements OrderOperations {
                 
                 //calculate nearest shop
                 int nearestShop = -1; 
-                int nearestDistance = -1; 
-                
-                
-                
+                int nearestDistance = Integer.MAX_VALUE; 
+                int distance;
+                for(int idCity:shopCities){
+                    distance = DijkstraAlgorithm.calculateShortestPath(graph, customerCity, idCity); 
+                    if(distance<nearestDistance){
+                        nearestDistance = distance; 
+                        nearestShop=idCity; 
+                    }
+                }
+                //step 1: send from all shop to nearest shop, write it to db
                 
                 
                 
