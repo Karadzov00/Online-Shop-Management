@@ -203,7 +203,55 @@ public class ka190444_OrderOperations implements OrderOperations {
                 }
                 
                 //make new transactions for every shop from the order 
-                
+                String queryShopSums = 
+                        "select s.IdShop, \n" +
+                        "SUM(a.Price*oa.Amount*((100-s.Discount)/cast(100 as decimal)))\n" +
+                        "as totalSum\n" +
+                        "from OrderArticle oa join Articles a \n" +
+                        "on oa.IdArticle=a.IdArticle\n" +
+                        "join Shops s on s.IdShop=a.IdShop\n" +
+                        "join Orders o on oa.IdOrder=o.IdOrder\n" +
+                        "where o.IdOrder=?\n" +
+                        "group by s.IdShop"; 
+                try (
+                    PreparedStatement psShopSums = conn.prepareStatement(queryShopSums);  ) {
+                    psShopSums.setInt(1, i);
+                    System.out.println("shop cities for given order");
+                    try(ResultSet rsShopSums = psShopSums.executeQuery()) {
+                        
+                        while(rsShopSums.next()) {
+                            System.out.println(rsShopSums.getInt(1));
+                            //insert transaction for shop 
+                            int shopId = rs.getInt("IdShop"); 
+                            BigDecimal totalSum = rs.getBigDecimal("totalSum"); 
+                            
+                            String queryInsertTransaction = 
+                                    "insert into Transactions\n" +
+                                    "(Amount, IdShop, IdOrder)\n" +
+                                    "values(?, ?, ?)";
+                            try ( PreparedStatement psTransaction = conn.prepareStatement(queryInsertTransaction, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                                psTransaction.setBigDecimal(1, totalSum);
+                                psTransaction.setInt(2, shopId);
+                                psTransaction.setInt(3, i);
+                                psTransaction.executeUpdate();
+                                ResultSet rsTransaction = psTransaction.getGeneratedKeys();
+                                if (rs.next()) {
+                                    System.out.println("new transaction created");
+                                }
+                            } catch (SQLException ex) {
+                                Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            
+                            
+                        }
+                        
+                        
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(ka190444_ShopOperations.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 
                 graph = DijkstraAlgorithm.formGraph(); 
                 //select customer city 
