@@ -206,7 +206,7 @@ public class ka190444_TransactionOperations implements TransactionOperations {
     @Override
     public BigDecimal getAmmountThatBuyerPayedForOrder(int i) {
         Connection conn = DB.getInstance().getConnection();
-        String query = "select Amount\n" +
+        String query = "select sum(Amount)\n" +
                         "from Transactions t join Orders o\n" +
                         "on t.IdOrder=o.IdOrder\n" +
                         "where o.IdOrder=?"; 
@@ -230,7 +230,7 @@ public class ka190444_TransactionOperations implements TransactionOperations {
     @Override
     public BigDecimal getAmmountThatShopRecievedForOrder(int i, int i1) {//int orderId, int shopId
         Connection conn = DB.getInstance().getConnection();
-        String query = "select 0.95*Amount\n" +
+        String query = "select 0.95*sum(Amount)\n" +
                         "from Transactions\n" +
                         "where IdShop=? and IdOrder=?"; 
         try (
