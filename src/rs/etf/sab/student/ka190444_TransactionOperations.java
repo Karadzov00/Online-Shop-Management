@@ -275,8 +275,29 @@ public class ka190444_TransactionOperations implements TransactionOperations {
     }
 
     @Override
-    public BigDecimal getSystemProfit() {//0.95*(sum(all orders))
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public BigDecimal getSystemProfit() {//0.05*(sum(all orders))
+        Connection conn = DB.getInstance().getConnection();
+        String query = "select SUM(t.Amount*t.SystemPercentage)\n" +
+                        "from Transactions t\n" +
+                        "join Orders o on t.IdOrder=o.IdOrder\n" +
+                        "where t.SystemTransaction is NULL"; 
+        try (
+            PreparedStatement stmt = conn.prepareStatement(query);  ) {
+            try(ResultSet rs = stmt.executeQuery()) {
+                if(rs.next()) {
+                    System.out.println("system profit is:"+rs.getBigDecimal(1));
+                    return rs.getBigDecimal(1); 
+                }
+                else{
+                    return new BigDecimal(0);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ka190444_TransactionOperations.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ka190444_TransactionOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return new BigDecimal(-1);     
     }
     
 }
